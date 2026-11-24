@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P1 Pilot Tracker</title>
+<style>
+  :root {
+    --navy:#122e4b; --blue:#1576b0; --teal:#0f7f80; --bg:#f3f6f9; --card:#fff;
+    --line:#d8e1ea; --text:#14263a; --muted:#5d7083;
+    --ok:#1b7f4b; --okbg:#e6f4ec; --warn:#a0640a; --warnbg:#fdf3e1; --bad:#b03030; --badbg:#fbe9e9;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header { background:var(--navy); color:#fff; padding:14px 16px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:2px 0 0; color:#b9cde0; font-size:13px; }
+  nav { display:flex; gap:4px; flex-wrap:wrap; padding:8px 16px; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  nav button { border:0; background:none; padding:8px 12px; border-radius:6px; font:inherit; color:var(--muted); cursor:pointer; }
+  nav button.active { background:#e5f0f8; color:var(--blue); font-weight:600; }
+  main { max-width:1150px; margin:0 auto; padding:16px; }
+  section { display:none; } section.active { display:block; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  h2 { font-size:17px; margin:0 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px 12px; }
+  label { display:block; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  input, select, textarea { width:100%; margin-top:4px; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; color:var(--text); }
+  textarea { min-height:60px; }
+  .btn { border:0; border-radius:6px; padding:9px 14px; font:inherit; font-weight:600; cursor:pointer; background:var(--blue); color:#fff; }
+  .btn.sec { background:#e5ecf2; color:var(--text); }
+  .btn.ok { background:var(--ok); } .btn.bad { background:var(--bad); }
+  .btn.sm { padding:5px 9px; font-size:13px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:top; white-space:nowrap; }
+  th { font-size:12px; color:var(--muted); text-transform:uppercase; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:12px; font-weight:600; }
+  .t-ok { background:var(--okbg); color:var(--ok); } .t-warn { background:var(--warnbg); color:var(--warn); } .t-bad { background:var(--badbg); color:var(--bad); }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:16px; }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .kpi b { display:block; font-size:26px; color:var(--navy); }
+  .kpi span { font-size:13px; color:var(--muted); }
+  .note { background:var(--warnbg); color:#6b4a0c; border-radius:8px; padding:10px 12px; font-size:14px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .check { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--line); }
+  .check input { width:auto; margin-top:3px; }
+  .check small { color:var(--muted); display:block; }
+  .neg { color:var(--bad); font-weight:600; } .pos { color:var(--ok); font-weight:600; }
+  @media print { nav, .row, .btn { display:none !important; } section { display:block !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>P1 Pilot Tracker: raw material visibility</h1>
+  <p>PPG Shildon · Records pre-charge transfers into P1 and the admin down-dating that follows · Data is saved in this browser only, so export a backup every day</p>
+</header>
+<nav id="tabs">
+  <button data-tab="charge" class="active">1. Pre-charge</button>
+  <button data-tab="open">2. Awaiting admin issue</button>
+  <button data-tab="recon">3. Daily reconciliation</button>
+  <button data-tab="exc">4. Exceptions</button>
+  <button data-tab="kpi">5. KPIs</button>
+  <button data-tab="gates">6. Pilot gates</button>
+  <button data-tab="data">Data / backup</button>
+</nav>
+<main>
+
+<!-- 1. PRE-CHARGE -->
+<section id="charge" class="active">
+  <div class="card">
+    <h2>Log a pre-charge (operator)</h2>
+    <p class="muted">Fill this in when material is physically charged and the RF transfer from SEAL PROD to P1 is done.</p>
+    <form id="chargeForm">
+      <div class="grid">
+        <div><label>Date / time charged<input type="datetime-local" name="chargedAt" required></label></div>
+        <div><label>Item code<input name="item" required placeholder="e.g. RM12345"></label></div>
+        <div><label>Description<input name="desc" placeholder="Material name"></label></div>
+        <div><label>Lot number<input name="lot" required></label></div>
+        <div><label>Quantity<input name="qty" type="number" step="any" min="0" required></label></div>
+        <div><label>Unit<select name="uom"><option>kg</option><option>drum</option><option>L</option><option>each</option></select></label></div>
+        <div><label>Batch / works order<input name="batch" required></label></div>
+        <div><label>From locator<input name="from" value="SEAL PROD"></label></div>
+        <div><label>Operator<input name="operator" required></label></div>
+        <div><label>RF transfer to P1 done?<select name="rf"><option value="yes">Yes</option><option value="no">No (log an exception)</option></select></label></div>
+      </div>
+      <label style="margin-top:10px">Notes<textarea name="notes"></textarea></label>
+      <div class="row"><button class="btn" type="submit">Add pre-charge</button><span id="chargeMsg" class="muted"></span></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Today's pre-charges</h2>
+    <div class="table-wrap"><table id="todayTable"></table></div>
+  </div>
+</section>
+
+<!-- 2. OPEN -->
+<section id="open">
+  <div class="card">
+    <h2>In P1: consumed, awaiting admin issue</h2>
+    <p class="muted">Production admin works through this list. Age colours: <span class="tag t-ok">under 24h</span> <span class="tag t-warn">24–48h</span> <span class="tag t-bad">over 48h</span></p>
+    <div class="row" style="margin-top:0"><input id="openFilter" placeholder="Filter by item, lot or batch…" style="max-width:320px;margin:0"></div>
+    <div class="table-wrap" style="margin-top:10px"><table id="openTable"></table></div>
+  </div>
+  <div class="card">
+    <h2>P1 balance by item (what Oracle P1 should show)</h2>
+    <div class="table-wrap"><table id="balTable"></table></div>
+  </div>
+</section>
+
+<!-- 3. RECON -->
+<section id="recon">
+  <div class="card">
+    <h2>Daily P1 reconciliation</h2>
+    <p class="muted">Once a day, enter the P1 on-hand quantity Oracle shows for each item. Any variance should be investigated and logged as an exception.</p>
+    <div class="table-wrap"><table id="reconTable"></table></div>
+    <div class="grid" style="margin-top:12px">
+      <div><label>Reconciled by<input id="reconBy"></label></div>
+      <div style="grid-column:span 2"><label>Comments<input id="reconNote"></label></div>
+    </div>
+    <div class="row"><button class="btn" id="saveRecon">Save reconciliation</button><span id="reconMsg" class="muted"></span></div>
+  </div>
+  <div class="card">
+    <h2>Reconciliation history</h2>
+    <div class="table-wrap"><table id="reconHist"></table></div>
+  </div>
+</section>
+
+<!-- 4. EXCEPTIONS -->
+<section id="exc">
+  <div class="card">
+    <h2>Log an exception</h2>
+    <form id="excForm">
+      <div class="grid">
+        <div><label>Date / time<input type="datetime-local" name="at" required></label></div>
+        <div><label>Type<select name="type">
+          <option>RF transfer missed</option><option>Wrong quantity transferred</option><option>Wrong lot / item</option>
+          <option>Partial charge</option><option>Batch cancelled / reversal</option><option>Reconciliation variance</option>
+          <option>Stock not found (thought available)</option><option>Batch start delayed by material</option><option>Other</option>
+        </select></label></div>
+        <div><label>Item / lot<input name="ref"></label></div>
+        <div><label>Batch<input name="batch"></label></div>
+        <div><label>Delay caused (mins)<input name="delay" type="number" min="0" value="0"></label></div>
+        <div><label>Raised by<input name="by" required></label></div>
+      </div>
+      <label style="margin-top:10px">What happened / action taken<textarea name="detail" required></textarea></label>
+      <div class="row"><button class="btn" type="submit">Log exception</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Exception log</h2>
+    <div class="table-wrap"><table id="excTable"></table></div>
+  </div>
+</section>
+
+<!-- 5. KPIs -->
+<section id="kpi">
+  <div class="kpis" id="kpiTiles"></div>
+  <div class="card">
+    <h2>Baseline (before the pilot)</h2>
+    <p class="muted">Agree these figures with the sponsor before go-live. Pilot results are compared against them. The proposal's 2–4 day figure is a Cell Leader estimate.</p>
+    <div class="grid" id="baselineForm">
+      <div><label>Avg charge → down-date (hours)<input type="number" step="any" data-b="lagHrs" placeholder="e.g. 72"></label></div>
+      <div><label>Stock discrepancies / week<input type="number" step="any" data-b="discWk"></label></div>
+      <div><label>Batch starts delayed / week<input type="number" step="any" data-b="delayWk"></label></div>
+      <div><label>Mins spent on stock checks / week<input type="number" step="any" data-b="checkMins"></label></div>
+      <div><label>Pilot start date<input type="date" data-b="start"></label></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Operator impact (time study)</h2>
+    <p class="muted">Time a sample of pre-charges with the extra RF step. Enter seconds added per transfer.</p>
+    <div class="row" style="margin-top:0"><input id="tsVal" type="number" min="0" placeholder="Seconds added" style="max-width:180px;margin:0"><button class="btn sm" id="tsAdd">Add sample</button><span id="tsInfo" class="muted"></span></div>
+  </div>
+  <div class="card">
+    <h2>Weekly summary</h2>
+    <div class="table-wrap"><table id="weekTable"></table></div>
+  </div>
+</section>
+
+<!-- 6. GATES -->
+<section id="gates">
+  <div class="card">
+    <h2>Pilot gates and approvals</h2>
+    <div class="note">Decision gate: no change to the live process until Oracle, supply chain, production admin and Quality approve the test results.</div>
+    <div id="gateList" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section id="data">
+  <div class="card">
+    <h2>Export and backup</h2>
+    <p class="muted">Everything is stored in this browser on this device. Download a backup daily and keep it on the shared drive. The CSV files open in Excel.</p>
+    <div class="row">
+      <button class="btn" id="csvCharges">Transfers CSV</button>
+      <button class="btn" id="csvExc">Exceptions CSV</button>
+      <button class="btn" id="csvRecon">Reconciliations CSV</button>
+      <button class="btn sec" id="jsonOut">Full backup (.json)</button>
+      <label class="btn sec" style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--text)">Restore backup<input type="file" id="jsonIn" accept=".json" hidden></label>
+    </div>
+    <div class="row">
+      <button class="btn sec" id="demo">Load demo data</button>
+      <button class="btn bad" id="wipe">Clear all data</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const KEY = 'ppg-p1-pilot-v1';
+const GATES = [
+  ['Prepare', 'Production + supply chain sponsor nominated'],
+  ['Prepare', 'Owner, scope and baseline agreed'],
+  ['Prepare', 'P1 locator created in Oracle'],
+  ['Prepare', 'RF / Oracle authorisations set up for operators and admin'],
+  ['Validate', 'Oracle key user confirms P1 is EXCLUDED from planning / MRP availability'],
+  ['Validate', 'Admin issue / down-dating from P1 tested end-to-end'],
+  ['Validate', 'Lot, batch reference and audit trail confirmed'],
+  ['Validate', 'Reversals, adjustments, partials and cancellations tested'],
+  ['Validate', 'kg (selected quantity) and whole-drum items tested'],
+  ['Approve', 'SOP written and approved'],
+  ['Approve', 'Operators and admin briefed / trained on SOP'],
+  ['Approve', 'Oracle sign-off'],
+  ['Approve', 'Supply chain sign-off'],
+  ['Approve', 'Production admin sign-off'],
+  ['Approve', 'Quality sign-off'],
+  ['Pilot', 'Week 1 review complete'],
+  ['Pilot', 'Week 2 review complete'],
+  ['Pilot', 'Week 3 review complete'],
+  ['Pilot', 'Week 4 review complete'],
+  ['Decide', 'KPI review vs baseline done; rollout / closure decision recorded'],
+];
+
+let S = load();
+function blank(){ return { charges:[], exceptions:[], recons:[], baseline:{}, gates:{}, timeStudy:[] }; }
+function load(){ try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e){ return blank(); } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ alert('Could not save. Browser storage may be blocked. Export a backup now.'); } render(); }
+
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const nowLocal = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,16); };
+const fmt = iso => iso ? new Date(iso).toLocaleString('en-GB', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+const hrs = (a,b) => (new Date(b) - new Date(a)) / 36e5;
+const ageTag = h => `<span class="tag ${h<24?'t-ok':h<48?'t-warn':'t-bad'}">${h<48? h.toFixed(1)+'h' : (h/24).toFixed(1)+'d'}</span>`;
+const n = v => Math.round(v*1000)/1000;
+
+// Tabs
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tabs button, section').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); $('#'+b.dataset.tab).classList.add('active');
+  try { localStorage.setItem(KEY+'-tab', b.dataset.tab); } catch(e){}
+});
+try { const t = localStorage.getItem(KEY+'-tab'); if (t) document.querySelector(`#tabs button[data-tab="${t}"]`)?.click(); } catch(e){}
+
+// Pre-charge
+$('#chargeForm').chargedAt.value = nowLocal();
+$('#chargeForm').onsubmit = e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const c = { id:uid(), ...f, qty:+f.qty, chargedAt:new Date(f.chargedAt).toISOString(), loggedAt:new Date().toISOString(), status:'open' };
+  S.charges.push(c);
+  if (f.rf === 'no') S.exceptions.push({ id:uid(), at:c.chargedAt, type:'RF transfer missed', ref:`${c.item} / ${c.lot}`, batch:c.batch, delay:0, by:c.operator, detail:'Charged without an RF transfer to P1. Material may still show as available in SEAL PROD.' });
+  const keep = { from:f.from, operator:f.operator, uom:f.uom };
+  e.target.reset(); for (const k in keep) e.target[k].value = keep[k];
+  e.target.chargedAt.value = nowLocal();
+  $('#chargeMsg').textContent = `Added ${c.qty} ${c.uom} of ${c.item} to P1.`;
+  save();
+};
+
+function downdate(id){
+  const who = prompt('Down-dated by (admin name):'); if (!who) return;
+  const c = S.charges.find(x => x.id === id);
+  Object.assign(c, { status:'issued', issuedAt:new Date().toISOString(), issuedBy:who });
+  save();
+}
+function cancelCharge(id){
+  const why = prompt('Reason for reversal / cancellation (the material must be transferred back out of P1 in Oracle):'); if (!why) return;
+  const c = S.charges.find(x => x.id === id);
+  Object.assign(c, { status:'reversed', issuedAt:new Date().toISOString(), reason:why });
+  S.exceptions.push({ id:uid(), at:new Date().toISOString(), type:'Batch cancelled / reversal', ref:`${c.item} / ${c.lot}`, batch:c.batch, delay:0, by:'', detail:why });
+  save();
+}
+function partial(id){
+  const c = S.charges.find(x => x.id === id);
+  const q = parseFloat(prompt(`Quantity actually used out of ${c.qty} ${c.uom}? The rest is recorded as returned from P1.`)); if (isNaN(q) || q < 0 || q > c.qty) return;
+  S.exceptions.push({ id:uid(), at:new Date().toISOString(), type:'Partial charge', ref:`${c.item} / ${c.lot}`, batch:c.batch, delay:0, by:'', detail:`Qty adjusted ${c.qty} → ${q} ${c.uom}. ${n(c.qty-q)} ${c.uom} to be transferred back from P1.` });
+  c.qty = q; save();
+}
+
+// Exceptions
+$('#excForm').at.value = nowLocal();
+$('#excForm').onsubmit = e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  S.exceptions.push({ id:uid(), ...f, delay:+f.delay||0, at:new Date(f.at).toISOString() });
+  e.target.reset(); e.target.at.value = nowLocal(); save();
+};
+
+// Recon
+function balances(){
+  const m = {};
+  S.charges.filter(c => c.status === 'open').forEach(c => {
+    const k = c.item + '|' + c.uom;
+    m[k] ??= { item:c.item, desc:c.desc, uom:c.uom, qty:0, lines:0, oldest:c.chargedAt };
+    m[k].qty += c.qty; m[k].lines++; if (c.chargedAt < m[k].oldest) m[k].oldest = c.chargedAt;
+  });
+  return Object.values(m).sort((a,b) => a.item.localeCompare(b.item));
+}
+$('#saveRecon').onclick = () => {
+  const rows = [...document.querySelectorAll('#reconTable input[data-item]')].map(i => ({
+    item:i.dataset.item, uom:i.dataset.uom, expected:+i.dataset.exp, oracle:i.value === '' ? null : +i.value
+  }));
+  if (!rows.length) { $('#reconMsg').textContent = 'Nothing open in P1. Saved as a zero reconciliation.'; }
+  const by = $('#reconBy').value.trim(); if (!by) { alert('Enter who reconciled.'); return; }
+  const missing = rows.filter(r => r.oracle === null); if (missing.length && !confirm(`${missing.length} item(s) have no Oracle figure. Save anyway?`)) return;
+  const variances = rows.filter(r => r.oracle !== null && Math.abs(r.oracle - r.expected) > 1e-6);
+  S.recons.push({ id:uid(), at:new Date().toISOString(), by, note:$('#reconNote').value, rows, variances:variances.length });
+  variances.forEach(v => S.exceptions.push({ id:uid(), at:new Date().toISOString(), type:'Reconciliation variance', ref:v.item, batch:'', delay:0, by, detail:`Tracker ${v.expected} ${v.uom} vs Oracle P1 ${v.oracle} ${v.uom} (variance ${n(v.oracle - v.expected)})` }));
+  $('#reconNote').value = ''; $('#reconMsg').textContent = `Saved. ${variances.length} variance(s) logged as exceptions.`;
+  save();
+};
+
+// Baseline + time study
+document.querySelectorAll('[data-b]').forEach(i => {
+  i.value = S.baseline[i.dataset.b] ?? '';
+  i.onchange = () => { S.baseline[i.dataset.b] = i.value; save(); };
+});
+$('#tsAdd').onclick = () => { const v = +$('#tsVal').value; if (v > 0) { S.timeStudy.push(v); $('#tsVal').value=''; save(); } };
+
+// Render
+function table(el, head, rows, empty='Nothing here yet.'){
+  el.innerHTML = `<thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${head.length}" class="muted">${empty}</td></tr>`}</tbody>`;
+}
+function render(){
+  const now = new Date().toISOString();
+  const today = new Date().toDateString();
+
+  table($('#todayTable'), ['Time','Item','Lot','Qty','Batch','Operator','Status'],
+    S.charges.filter(c => new Date(c.chargedAt).toDateString() === today).reverse().map(c =>
+      `<tr><td>${fmt(c.chargedAt)}</td><td>${esc(c.item)} <span class="muted">${esc(c.desc)}</span></td><td>${esc(c.lot)}</td><td>${c.qty} ${esc(c.uom)}</td><td>${esc(c.batch)}</td><td>${esc(c.operator)}</td><td>${statusTag(c)}</td></tr>`));
+
+  const fq = ($('#openFilter').value || '').toLowerCase();
+  const open = S.charges.filter(c => c.status === 'open' && (!fq || [c.item,c.lot,c.batch,c.desc].join(' ').toLowerCase().includes(fq)))
+    .sort((a,b) => a.chargedAt.localeCompare(b.chargedAt));
+  table($('#openTable'), ['Age','Charged','Item','Lot','Qty','Batch','Operator','Actions'],
+    open.map(c => `<tr><td>${ageTag(hrs(c.chargedAt, now))}</td><td>${fmt(c.chargedAt)}</td><td>${esc(c.item)} <span class="muted">${esc(c.desc)}</span></td><td>${esc(c.lot)}</td><td>${c.qty} ${esc(c.uom)}</td><td>${esc(c.batch)}</td><td>${esc(c.operator)}</td>
+      <td><button class="btn ok sm" onclick="downdate('${c.id}')">Down-dated</button> <button class="btn sec sm" onclick="partial('${c.id}')">Partial</button> <button class="btn sec sm" onclick="cancelCharge('${c.id}')">Reverse</button></td></tr>`),
+    'Nothing waiting. P1 should be empty in Oracle.');
+
+  const bal = balances();
+  table($('#balTable'), ['Item','Description','Qty in P1','Lines','Oldest'],
+    bal.map(b => `<tr><td>${esc(b.item)}</td><td>${esc(b.desc)}</td><td><b>${n(b.qty)} ${esc(b.uom)}</b></td><td>${b.lines}</td><td>${ageTag(hrs(b.oldest, now))}</td></tr>`), 'P1 is empty.');
+
+  table($('#reconTable'), ['Item','Tracker expects in P1','Oracle P1 on-hand','Variance'],
+    bal.map(b => `<tr><td>${esc(b.item)} <span class="muted">${esc(b.desc)}</span></td><td>${n(b.qty)} ${esc(b.uom)}</td>
+      <td><input type="number" step="any" data-item="${esc(b.item)}" data-uom="${esc(b.uom)}" data-exp="${b.qty}" style="max-width:130px;margin:0" oninput="varCell(this)"></td><td class="var">–</td></tr>`), 'Nothing open in P1. Oracle P1 should show zero.');
+
+  table($('#reconHist'), ['Date','By','Items checked','Variances','Comments'],
+    S.recons.slice().reverse().map(r => `<tr><td>${fmt(r.at)}</td><td>${esc(r.by)}</td><td>${r.rows.length}</td><td>${r.variances ? `<span class="tag t-bad">${r.variances}</span>` : '<span class="tag t-ok">0</span>'}</td><td>${esc(r.note)}</td></tr>`));
+
+  table($('#excTable'), ['When','Type','Item / lot','Batch','Delay','By','Detail'],
+    S.exceptions.slice().reverse().map(x => `<tr><td>${fmt(x.at)}</td><td>${esc(x.type)}</td><td>${esc(x.ref)}</td><td>${esc(x.batch)}</td><td>${x.delay ? x.delay+' min' : ''}</td><td>${esc(x.by)}</td><td style="white-space:normal;min-width:240px">${esc(x.detail)}</td></tr>`));
+
+  renderKpis(now);
+  renderGates();
+  const ts = S.timeStudy; $('#tsInfo').textContent = ts.length ? `${ts.length} samples · avg ${(ts.reduce((a,b)=>a+b,0)/ts.length).toFixed(0)} s added per transfer` : 'No samples yet.';
+}
+function statusTag(c){
+  return c.status === 'open' ? '<span class="tag t-warn">In P1</span>' : c.status === 'issued' ? '<span class="tag t-ok">Down-dated</span>' : '<span class="tag t-bad">Reversed</span>';
+}
+function varCell(i){
+  const td = i.closest('tr').querySelector('.var');
+  if (i.value === '') { td.textContent = '–'; td.className = 'var'; return; }
+  const v = n(+i.value - +i.dataset.exp);
+  td.textContent = v === 0 ? '✓ matches' : (v > 0 ? '+' : '') + v; td.className = 'var ' + (v === 0 ? 'pos' : 'neg');
+}
+function renderKpis(now){
+  const issued = S.charges.filter(c => c.status === 'issued');
+  const lags = issued.map(c => hrs(c.chargedAt, c.issuedAt));
+  const avg = lags.length ? lags.reduce((a,b)=>a+b,0)/lags.length : null;
+  const in24 = lags.length ? lags.filter(h => h <= 24).length / lags.length * 100 : null;
+  const open = S.charges.filter(c => c.status === 'open');
+  const over48 = open.filter(c => hrs(c.chargedAt, now) > 48).length;
+  const rfMissed = S.exceptions.filter(x => x.type === 'RF transfer missed').length;
+  const rfRate = S.charges.length ? (1 - rfMissed / S.charges.length) * 100 : null;
+  const delays = S.exceptions.filter(x => x.type === 'Batch start delayed by material' || x.type === 'Stock not found (thought available)').length;
+  const b = S.baseline;
+  const tile = (v, label, sub='') => `<div class="kpi"><b>${v}</b><span>${label}${sub ? '<br>'+sub : ''}</span></div>`;
+  $('#kpiTiles').innerHTML =
+    tile(open.length, 'Lines open in P1', over48 ? `<span class="neg">${over48} over 48h</span>` : 'none over 48h') +
+    tile(avg == null ? '–' : avg.toFixed(1)+'h', 'Avg charge → down-date', b.lagHrs ? `baseline ${b.lagHrs}h` : 'set a baseline below') +
+    tile(in24 == null ? '–' : in24.toFixed(0)+'%', 'Down-dated within 24h') +
+    tile(rfRate == null ? '–' : rfRate.toFixed(0)+'%', 'Charges with an RF transfer to P1') +
+    tile(S.exceptions.length, 'Exceptions logged') +
+    tile(delays, 'Batch delays / stock not found', b.delayWk ? `baseline ${b.delayWk}/wk` : '') +
+    tile(S.recons.length, 'Reconciliations done', S.recons.length ? `last ${fmt(S.recons.at(-1).at)}` : 'aim for one a day');
+
+  const weeks = {};
+  const wk = iso => { const d = new Date(iso); const s = b.start ? new Date(b.start) : null; if (s) return 'Week ' + (Math.floor((d - s) / 6048e5) + 1); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay()+6)%7)); return 'w/c ' + m.toLocaleDateString('en-GB'); };
+  S.charges.forEach(c => { const w = weeks[wk(c.chargedAt)] ??= { c:0, lag:[], exc:0, delay:0, rec:0, varc:0 }; w.c++; if (c.status==='issued') w.lag.push(hrs(c.chargedAt,c.issuedAt)); });
+  S.exceptions.forEach(x => { const w = weeks[wk(x.at)] ??= { c:0, lag:[], exc:0, delay:0, rec:0, varc:0 }; w.exc++; w.delay += x.delay||0; });
+  S.recons.forEach(r => { const w = weeks[wk(r.at)] ??= { c:0, lag:[], exc:0, delay:0, rec:0, varc:0 }; w.rec++; w.varc += r.variances; });
+  table($('#weekTable'), ['Week','Transfers','Avg lag','Exceptions','Delay mins','Recons','Variances'],
+    Object.entries(weeks).sort().map(([k,w]) => `<tr><td>${k}</td><td>${w.c}</td><td>${w.lag.length ? (w.lag.reduce((a,b)=>a+b,0)/w.lag.length).toFixed(1)+'h' : '–'}</td><td>${w.exc}</td><td>${w.delay}</td><td>${w.rec}</td><td>${w.varc}</td></tr>`));
+}
+function renderGates(){
+  let last = '';
+  $('#gateList').innerHTML = GATES.map(([stage, txt], i) => {
+    const g = S.gates[i] || {};
+    const h = stage !== last ? `<h2 style="margin:14px 0 4px">${stage}</h2>` : ''; last = stage;
+    return h + `<div class="check"><input type="checkbox" ${g.done?'checked':''} onchange="gate(${i},this.checked)"><div>${esc(txt)}${g.done ? `<small>Done ${fmt(g.at)}${g.by ? ' · '+esc(g.by) : ''}</small>` : ''}</div></div>`;
+  }).join('');
+}
+function gate(i, done){
+  const by = done ? (prompt('Confirmed by (name):') || '') : '';
+  S.gates[i] = done ? { done:true, at:new Date().toISOString(), by } : {};
+  save();
+}
+$('#openFilter').oninput = render;
+setInterval(render, 60000);
+
+// Export
+function dl(name, text, type){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name; a.click(); }
+function csv(rows, cols){ const q = v => `"${String(v ?? '').replace(/"/g,'""')}"`; return [cols.join(','), ...rows.map(r => cols.map(c => q(r[c])).join(','))].join('\n'); }
+const stamp = () => new Date().toISOString().slice(0,10);
+$('#csvCharges').onclick = () => dl(`p1-transfers-${stamp()}.csv`, csv(S.charges.map(c => ({...c, lagHours: c.issuedAt ? hrs(c.chargedAt,c.issuedAt).toFixed(2) : ''})), ['chargedAt','item','desc','lot','qty','uom','batch','from','operator','rf','status','issuedAt','issuedBy','lagHours','reason','notes']), 'text/csv');
+$('#csvExc').onclick = () => dl(`p1-exceptions-${stamp()}.csv`, csv(S.exceptions, ['at','type','ref','batch','delay','by','detail']), 'text/csv');
+$('#csvRecon').onclick = () => dl(`p1-reconciliations-${stamp()}.csv`, csv(S.recons.flatMap(r => r.rows.length ? r.rows.map(x => ({at:r.at, by:r.by, ...x, variance: x.oracle==null?'':n(x.oracle-x.expected), note:r.note})) : [{at:r.at, by:r.by, note:r.note}]), ['at','by','item','uom','expected','oracle','variance','note']), 'text/csv');
+$('#jsonOut').onclick = () => dl(`p1-pilot-backup-${stamp()}.json`, JSON.stringify(S, null, 1), 'application/json');
+$('#jsonIn').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { const d = JSON.parse(t); if (!confirm('Replace all current data with this backup?')) return; S = Object.assign(blank(), d); save(); location.reload(); } catch(err){ alert('That file is not a valid backup.'); } }); };
+$('#wipe').onclick = () => { if (confirm('Delete ALL pilot data from this browser? Export a backup first.') && confirm('Are you sure?')) { S = blank(); save(); location.reload(); } };
+$('#demo').onclick = () => {
+  if (S.charges.length && !confirm('This adds demo records to your existing data. Continue?')) return;
+  const h = x => new Date(Date.now() - x*36e5).toISOString();
+  const add = (ago, item, desc, lot, qty, uom, batch, issuedAgo) => S.charges.push({ id:uid(), chargedAt:h(ago), loggedAt:h(ago), item, desc, lot, qty, uom, batch, from:'SEAL PROD', operator:'Demo Op', rf:'yes', status: issuedAgo!=null?'issued':'open', issuedAt: issuedAgo!=null?h(issuedAgo):undefined, issuedBy: issuedAgo!=null?'Demo Admin':undefined });
+  add(70,'RM10021','Epoxy resin A','L2311-04',200,'kg','WO-55120',50);
+  add(52,'RM20450','Solvent blend','L2310-19',1,'drum','WO-55120');
+  add(30,'RM10021','Epoxy resin A','L2311-04',150,'kg','WO-55133');
+  add(26,'RM30077','Pigment paste','L2311-02',12.5,'kg','WO-55133',4);
+  add(3,'RM20450','Solvent blend','L2311-01',2,'drum','WO-55141');
+  S.exceptions.push({ id:uid(), at:h(20), type:'Stock not found (thought available)', ref:'RM10021 / L2311-04', batch:'WO-55140', delay:45, by:'Demo Op', detail:'Oracle showed 350 kg in SEAL PROD; only 0 kg physically. Material had been pre-charged before P1 was in use.' });
+  save();
+};
+
+render();
+</script>
+</body>
+</html>
