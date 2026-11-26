@@ -34,3 +34,14 @@ This tracker is the paper trail and scoreboard for that process.
 3. **End of shift:** check tab 2 for red (>48h) lines and chase them.
 4. **Once a day:** run the P1 on-hand query in Oracle and complete tab 3.
 5. **Weekly:** review tab 5 with the sponsor, export the CSVs and tick the week's review on tab 6.
+
+---
+
+# ATHX Lite Plan tracker
+
+`athx-tracker.html` is a phone-first app for logging the 16-week ATHX beginner (Lite) plan from start to race day.
+Open it in a browser, or use the published Claude artifact version, which saves your log to your claude.ai account.
+
+- **Today**: week and day picker, weekly summary (sessions, time, kg lifted, PRs, run and ski/row km) and the day's workout. Open it to log sets (kg, reps, tick), times, distances and notes, start a session timer and finish with an RPE.
+- **Progress**: sessions done, top set per week for squat, press and deadlift, benchmarks (3RMs, 3km time trial, best zone ski) and the full plan grid.
+- **Profile**: start date, 12-week option (skips weeks 2-3 and 6-7), week 8 3RMs that drive the % targets from week 9, adjustment rules and a copy/paste backup.
