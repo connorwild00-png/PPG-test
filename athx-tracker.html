@@ -243,7 +243,7 @@ function phase1(w,d,i){
   if(d===0) return {title:'Strength A (Squat + Press)',effort:'Moderate-hard',blocks:[WARM,
     lift('Back Squat','squat',sq,'Back Squat',{notes:RPE_NOTE}),
     lift('Strict Press','press',pr,'Strict Press',{notes:RPE_NOTE}),
-    cardio('Finisher','Circuit',['3 rounds easy','4 rounds','4 rounds','2 rounds'][i],['rounds'],{mv:'Finisher',desc:'10 goblet squats, 10 push-ups, 200m row'})]};
+    cardio('Finisher','Circuit',['4 rounds','5 rounds','5 rounds','3 rounds'][i],['rounds'],{mv:'Finisher',desc:'12 goblet squats, 12 push-ups, 250m row'})]};
   if(d===1) return {title:'Endurance (Run + Ski)',effort:'Hard',blocks:[WARM,
     cardio('Run + Ski','Run + Ski',['20 min run/walk + 8 min ski','25 min run + 8 min ski','25 min run with 4 x 1 min faster + 10 min ski','20 min run + 6 min ski'][i],['mins','runKm','skiM'],{notes:i===0?['Walk breaks are fine in weeks 1-2.']:null})]};
   if(d===2) return {title:'Easy Engine + Accessories',effort:'Easy',blocks:[WARM,
@@ -255,7 +255,7 @@ function phase1(w,d,i){
     chk('Sandbag Carry','Carry',['4 x 20m sandbag bear-hug carry','4 x 25m','5 x 25m','3 x 20m'][i])]};
   if(d===4) return {title:'Metcon-X Skills + Conditioning',effort:'Hard',blocks:[WARM,
     chk('Movement Practice','Race Moves',['3 x 8 sandbag squats, 3 x 8 DB ground-to-overhead, 3 x 5 burpees over bench','Same as week 1, 10 reps','Same as week 1, 10 reps','Same as week 1, 6 reps'][i]),
-    cardio('Conditioning','EMOM',['EMOM 12','EMOM 14','EMOM 16','EMOM 10'][i],['notes'],{desc:'Rotate each minute: 10/8 cal row, 8 DB bench, 6 burpees over bench',notes:['EMOM = every minute on the minute. Start the next station at the top of each minute.','10/8 cal = 10 calories for men, 8 for women.']})]};
+    cardio('Conditioning','EMOM',['EMOM 16','EMOM 20','EMOM 24','EMOM 12'][i],['rounds','notes'],{desc:'Rotate each minute: 12/10 cal row, 10 DB bench, 8 burpees over bench, 10 sandbag squats',notes:['EMOM = every minute on the minute. Start the next station at the top of each minute.','12/10 cal = 12 calories for men, 10 for women.','Aim to finish each station in about 40s. If you can\'t, cut the reps so you still get 15-20s rest.']})]};
   return {title:'Long Easy Engine',effort:'Easy',blocks:[WARM,
     cardio('Long Easy Engine','Run / Erg',['30 min run/walk or erg','35 min','40 min','30 min'][i],['mins','runKm','rowM','skiM'],{notes:EASY_NOTE.concat(i===3?['Coach check before Phase 2: a continuous 30 min easy run.']:[])})]};
 }
@@ -264,7 +264,7 @@ function phase2(w,d,i){
   if(d===0) return {title:'Strength A (Squat + S2OH)',effort:'Moderate-hard',blocks:[WARM,
     lift('Back Squat','squat',hv,'Back Squat',{notes:RPE_NOTE}),
     lift('Shoulder-to-Overhead','press',hv,'S2OH',{notes:['Push press or jerk allowed, to match the race.'].concat(RPE_NOTE)}),
-    cardio('Finisher','AMRAP',['AMRAP 8','AMRAP 10','AMRAP 10','1 easy round'][i],['rounds'],{desc:'8 sandbag squats, 8 DB bench'})]};
+    cardio('Finisher','AMRAP',['AMRAP 10','AMRAP 12','AMRAP 14','AMRAP 6, easy'][i],['rounds'],{desc:'10 sandbag squats, 10 DB bench, 8 burpees over bench'})]};
   if(d===1) return {title:'Endurance (Run + Ski)',effort:i===3?'Easy':'Hard',blocks:[WARM,
     cardio('Run + Ski','Intervals',['4 x 800m run hard, 2 min walk + 10 min easy ski','5 x 800m + 12 min ski','3 x 1km + 3 x 3 min ski hard, 2 min rest','25 min easy run + 8 min ski'][i],['mins','runKm','skiM','splits'])]};
   if(d===2) return {title:'Easy Engine + Accessories',effort:'Easy',blocks:[WARM,
@@ -278,7 +278,7 @@ function phase2(w,d,i){
     if(i===3) return {title:'Test Day: 3-Rep Maxes',effort:'Hard',blocks:[WARM,
       {k:'test',name:'3RM Tests',tag:'Test',rx:'Build to a 3-rep max',desc:'Back squat, deadlift and shoulder-to-overhead. These numbers set every load from week 9.',notes:['Come in after an easy Monday-Thursday.','Build in small jumps. Stop when the bar slows or form breaks.']}]};
     return {title:'Metcon-X Conditioning',effort:'Hard',blocks:[WARM,
-      cardio('Conditioning',i===2?'For Time':'Rounds',['3 rounds','4 rounds','For time: 21-15-9','',][i],['time'],{desc:i===2?'Sandbag squats + burpees over bench':'15/12 cal row, 10 DB G2OH, 10 DB bench, 10 burpees over bench'})]};
+      cardio('Conditioning',i===2?'For Time':'Rounds',['4 rounds','5 rounds','For time: 27-21-15-9','',][i],['time'],{desc:i===2?'Sandbag squats + burpees over bench, with 20/16 cal row between each set':'20/16 cal row, 12 DB G2OH, 12 DB bench, 12 burpees over bench'})]};
   }
   if(i===3) return {title:'3km Time Trial',effort:'Hard',blocks:[WARM,
     cardio('3km Time Trial','Test','3km run, all out',['time3k'],{notes:['Your 3km time sets goal pace for the Endurance zone from week 9.']})]};
@@ -291,7 +291,7 @@ function phase3(w,d,i){
          :lift('Back Squat','squat',['4 x 3 @ 90%','5 x 2 @ 95%','','3 x 2 @ 85%'][i],'Back Squat',{notes:PCT_NOTE}),
     i===2?lift('Shoulder-to-Overhead','press','5-min window: build to a heavy single','S2OH',{sets:4,reps:1,window:true,notes:WINDOW_NOTE})
          :lift('Shoulder-to-Overhead','press',['4 x 3 @ 90%','5 x 2 @ 95%','','3 x 2 @ 85%'][i],'S2OH',{notes:PCT_NOTE}),
-    ...(i===3?[]:[cardio('Finisher','DB Couplet',['2 rounds','3 rounds','3 rounds'][i],['reps'],{desc:'1 min max DB G2OH, 1 min max DB bench, 1 min rest'})])]};
+    ...(i===3?[]:[cardio('Finisher','DB Triplet',['3 rounds','4 rounds','4 rounds'][i],['reps'],{desc:'1 min max DB G2OH, 1 min max DB bench, 1 min max cal row, 1 min rest'})])]};
   if(d===1) return {title:'Endurance Zone',effort:i===3?'Easy':'Hard',blocks:[WARM,
     cardio('Endurance Zone',i===2?'Zone Sim':'Run + Ski',['2km @ goal 3km pace + 8 min max ski','3km @ goal pace + 10 min max ski','3km + max ski to a 24 min cap','20 min easy run + 6 min easy ski'][i],['runTime','runKm','skiM'],{notes:i===2?['Full zone simulation. The 3km pace you hold here is your race pace.']:i<2?['Goal pace is set from your week 8 3km time trial.']:null})]};
   if(d===2) return {title:'Easy Engine + Weak Station',effort:'Easy',blocks:[WARM,
@@ -302,7 +302,7 @@ function phase3(w,d,i){
          :lift('Deadlift','deadlift',['4 x 3 @ 90%','5 x 3 @ 92%','','3 x 2 @ 85%'][i],'Deadlift',{notes:i===0?['Last 2 sets at the same load.'].concat(PCT_NOTE):PCT_NOTE}),
     chk('Carry + Accessories','Carry',i===3?'3 x 20m sandbag carry':'6 x 30m sandbag carry, DB row 3 x 8')]};
   if(d===4) return {title:'Metcon-X',effort:i===3?'Easy':'Hard',blocks:[WARM,
-    cardio('Metcon-X',['Half Sim','Rounds','2/3 Sim','Practice'][i],['Half Metcon-X for time','3 rounds: 10 of each Metcon-X movement + 15/12 cal row','Two-thirds Metcon-X for time','Movement practice only, 5 reps each'][i],i===3?['notes']:['time','splits'],{notes:i===0?['Half the race reps and calories at Lite weights, in race order.','Pace it at about 80% effort and note which station slows you most. That station gets extra practice.']:i===2?['Note your splits for each station.']:null})]};
+    cardio('Metcon-X',['2/3 Sim','Rounds','Full Sim','Practice'][i],['Two-thirds Metcon-X for time','4 rounds: 12 of each Metcon-X movement + 20/16 cal row','Full Metcon-X for time','Half Metcon-X at easy pace, then 5 reps of each movement'][i],i===3?['time','notes']:['time','splits'],{notes:i===0?['Two-thirds of the race reps and calories at Lite weights, in race order.','Pace it at about 80% effort and note which station slows you most. That station gets extra practice on Wednesday.']:i===2?['Race reps and calories at Lite weights, in race order. Note your splits for each station.','Hold about 85% effort. This sets your pacing plan for week 13.']:null})]};
   return {title:'Long Easy Engine',effort:'Easy',blocks:[WARM,
     cardio('Long Easy Engine','Run + Ski',['50 min: 30 run + 20 ski','55 min','50 min','35 min'][i],['mins','runKm','skiM'],{notes:EASY_NOTE})]};
 }
@@ -334,9 +334,9 @@ function phase4(w,d,i){
   }
   if(d===4){
     if(i===3) return {title:'Rest Day',effort:'Rest',rest:true,blocks:[]};
-    return {title:['Easy Bike + Mobility','Half Metcon-X','Metcon-X Sharpen'][i],effort:i===1?'Moderate':'Easy',blocks:[WARM,
+    return {title:['Easy Bike + Mobility','Two-thirds Metcon-X','Metcon-X Sharpen'][i],effort:i===1?'Moderate':'Easy',blocks:[WARM,
       i===0?cardio('Easy Bike','Bike','20 min easy bike + mobility',['mins'])
-      :i===1?cardio('Half Metcon-X','Half Sim','Half Metcon-X at 85% effort',['time','splits'])
+      :i===1?cardio('Two-thirds Metcon-X','2/3 Sim','Two-thirds Metcon-X at 85% effort',['time','splits'])
       :chk('Movement Practice','Race Moves','5 reps of each Metcon-X movement, smooth')]};
   }
   if(i===3) return {title:'Race Day',effort:'Race',race:true,blocks:[
