@@ -245,7 +245,7 @@ function phase1(w,d,i){
     lift('Strict Press','press',pr,'Strict Press',{notes:RPE_NOTE}),
     cardio('Finisher','Circuit',['4 rounds','5 rounds','5 rounds','3 rounds'][i],['rounds'],{mv:'Finisher',desc:'12 goblet squats, 12 push-ups, 250m row'})]};
   if(d===1) return {title:'Endurance (Run + Ski)',effort:'Hard',blocks:[WARM,
-    cardio('Run + Ski','Run + Ski',['20 min run/walk + 8 min ski','25 min run + 8 min ski','25 min run with 4 x 1 min faster + 10 min ski','20 min run + 6 min ski'][i],['mins','runKm','skiM'],{notes:i===0?['Walk breaks are fine in weeks 1-2.']:null})]};
+    cardio('Run + Ski','Run + Ski',['25 min run/walk + 10 min ski','30 min run with 4 x 1 min faster + 10 min ski','30 min run with 6 x 1 min faster + 12 min ski with 4 x 1 min hard','20 min run with 4 x 30s faster + 8 min ski'][i],['mins','runKm','skiM'],{notes:i===0?['Walk breaks are fine in weeks 1-2.']:null})]};
   if(d===2) return {title:'Easy Engine + Accessories',effort:'Easy',blocks:[WARM,
     cardio('Easy Engine','Bike / Row',['20 min easy bike/row','25 min easy','25 min easy','20 min easy'][i],['mins','rowM'],{notes:EASY_NOTE}),
     chk('Accessories',i===3?'Mobility':'Core + Upper',['Ring rows 3 x 10, dead bugs 3 x 10, side plank 3 x 20s','Ring rows 3 x 10, dead bugs 3 x 10, side plank 3 x 20s','Ring rows 3 x 12, plank 3 x 30s','Mobility'][i])]};
@@ -266,7 +266,7 @@ function phase2(w,d,i){
     lift('Shoulder-to-Overhead','press',hv,'S2OH',{notes:['Push press or jerk allowed, to match the race.'].concat(RPE_NOTE)}),
     cardio('Finisher','AMRAP',['AMRAP 10','AMRAP 12','AMRAP 14','AMRAP 6, easy'][i],['rounds'],{desc:'10 sandbag squats, 10 DB bench, 8 burpees over bench'})]};
   if(d===1) return {title:'Endurance (Run + Ski)',effort:i===3?'Easy':'Hard',blocks:[WARM,
-    cardio('Run + Ski','Intervals',['4 x 800m run hard, 2 min walk + 10 min easy ski','5 x 800m + 12 min ski','3 x 1km + 3 x 3 min ski hard, 2 min rest','25 min easy run + 8 min ski'][i],['mins','runKm','skiM','splits'])]};
+    cardio('Run + Ski','Intervals',['5 x 800m run hard, 90s walk + 4 x 2 min ski hard, 1 min rest','6 x 800m run hard, 90s walk + 5 x 2 min ski hard, 1 min rest','4 x 1km run hard, 2 min rest + 4 x 3 min ski hard, 2 min rest','25 min easy run with 4 x 1 min faster + 10 min easy ski'][i],['mins','runKm','skiM','splits'])]};
   if(d===2) return {title:'Easy Engine + Accessories',effort:'Easy',blocks:[WARM,
     cardio('Easy Engine','Mixed Erg',['30 min easy mixed erg','30 min easy mixed erg','30 min easy','20 min easy'][i],['mins','rowM','skiM'],{notes:EASY_NOTE}),
     chk('Accessories',i===3?'Mobility':'Pull + Legs',['Banded pull-ups 3 x 6, walking lunges 3 x 10/leg, plank 3 x 40s','Banded pull-ups 3 x 6, walking lunges 3 x 10/leg, plank 3 x 40s','Pull-ups 4 x 5, lunges 3 x 12/leg','Mobility'][i])]};
@@ -293,7 +293,7 @@ function phase3(w,d,i){
          :lift('Shoulder-to-Overhead','press',['4 x 3 @ 90%','5 x 2 @ 95%','','3 x 2 @ 85%'][i],'S2OH',{notes:PCT_NOTE}),
     ...(i===3?[]:[cardio('Finisher','DB Triplet',['3 rounds','4 rounds','4 rounds'][i],['reps'],{desc:'1 min max DB G2OH, 1 min max DB bench, 1 min max cal row, 1 min rest'})])]};
   if(d===1) return {title:'Endurance Zone',effort:i===3?'Easy':'Hard',blocks:[WARM,
-    cardio('Endurance Zone',i===2?'Zone Sim':'Run + Ski',['2km @ goal 3km pace + 8 min max ski','3km @ goal pace + 10 min max ski','3km + max ski to a 24 min cap','20 min easy run + 6 min easy ski'][i],['runTime','runKm','skiM'],{notes:i===2?['Full zone simulation. The 3km pace you hold here is your race pace.']:i<2?['Goal pace is set from your week 8 3km time trial.']:null})]};
+    cardio('Endurance Zone',i===2?'Zone Sim':'Run + Ski',['2.5km @ goal 3km pace + 10 min max ski, then 4 x 400m run fast, 90s rest','3km @ goal pace + 12 min max ski, then 3 x 500m ski hard, 2 min rest','3km + max ski to a 24 min cap, rest 5 min, then 4 x 400m run fast','20 min easy run with 4 x 30s strides + 8 min easy ski'][i],['runTime','runKm','skiM'],{notes:i===2?['Full zone simulation. The 3km pace you hold here is your race pace.']:i<2?['Goal pace is set from your week 8 3km time trial.']:null})]};
   if(d===2) return {title:'Easy Engine + Weak Station',effort:'Easy',blocks:[WARM,
     cardio('Easy Engine','Erg',['30 min easy erg','35 min easy','35 min easy','20 min easy'][i],['mins','rowM','skiM'],{notes:EASY_NOTE}),
     chk(i===3?'Mobility':'Weak Station',i===3?'Mobility':'Practice',i===3?'Mobility':'3 x 10 of your slowest Metcon-X movement, light')]};
@@ -317,7 +317,7 @@ function phase4(w,d,i){
       lift('Back Squat','squat',r,'Back Squat',{notes:i===2?['Fast and crisp.']:null}),lift('Shoulder-to-Overhead','press',r,'S2OH')]};
   }
   if(d===1) return {title:['Easy Run','Endurance (Run + Ski)','Sharpen (Run + Ski)','Easy Run + Strides'][i],effort:i===0||i===3?'Easy':'Hard',blocks:[WARM,
-    cardio('Endurance','Run + Ski',['25 min easy run','2km @ goal pace + 6 min ski','1.5km @ goal pace + 4 min ski','15 min easy run + 3 x 30s strides'][i],['mins','runKm','skiM'])]};
+    cardio('Endurance','Run + Ski',['25 min easy run','2.5km @ goal pace + 8 min ski','1.5km @ goal pace + 4 min ski','15 min easy run + 3 x 30s strides'][i],['mins','runKm','skiM'])]};
   if(d===2){
     if(i===0) return {title:'Race Rehearsal',effort:'Hard',blocks:[WARM,
       cardio('Endurance Zone','Zone Sim','3km run + max ski, 24 min cap',['runTime','skiM'],{notes:['Practise warm-ups and fuelling between zones.']}),
